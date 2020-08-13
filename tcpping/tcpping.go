@@ -10,7 +10,7 @@ var(
 	host=flag.String("h","github.com","ip or domain")
 	port=flag.Int("p",443,"port")
 	count=flag.Int("n",4,"count")
-	timeout=flag.Int("t",1,"timeout")
+	timeout=flag.Int("t",1,"timeout of each request")
 	quiet=flag.Bool("q",false,"work in quiet mode")
 )
 func main(){
