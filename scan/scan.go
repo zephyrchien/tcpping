@@ -34,7 +34,7 @@ func main() {
 	}
 	go s.sendPort(ch)
 	for port := range ch {
-		go s.try(port, *timeOut, end)
+		go s.try(port, *timeOut, done)
 	}
 	for i := s.firstPort; i <= s.lastPort; i++ {
 		<-done
@@ -59,7 +59,7 @@ func (s *sensor) sendPort(ch chan int) {
 	}
 	close(ch)
 }
-func (s *sensor) try(port, timeout int, end chan int) {
+func (s *sensor) try(port, timeout int, done chan bool) {
 	target := fmt.Sprintf("%s:%d", s.host, port)
 	conn, err := net.DialTimeout(s.proto, target, time.Duration(timeout)*time.Second)
 	if err != nil {
