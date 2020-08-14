@@ -16,7 +16,7 @@ type sensor struct {
 }
 
 var (
-	host      = flag.String("h", "127.0.0.1", "host")
+	host      = flag.String("h", "github.com", "host")
 	firstPort = flag.Int("min", 1, "scan from")
 	lastPort  = flag.Int("max", 65535, "scan untill")
 	udp = flag.Bool("u",false,"use udp instead of tcp")
