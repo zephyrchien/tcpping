@@ -44,7 +44,7 @@ func tcping(target string,seq int)int{
 		status="open"
 	}
 	if !*quiet{
-		fmt.Printf("seq%d: %s[%s] %dms\n",seq,target,status,latency)
+		fmt.Printf("seq%4d: %s[%s] %dms\n",seq,target,status,latency)
 	}
 	return latency
 }
