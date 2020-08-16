@@ -11,7 +11,7 @@ type sensor struct {
 	host       string
 	firstPort  int
 	lastPort   int
-	proto	string
+	proto      string
 	markedPort []int
 }
 
@@ -19,17 +19,17 @@ var (
 	host      = flag.String("h", "github.com", "host")
 	firstPort = flag.Int("min", 1, "scan from")
 	lastPort  = flag.Int("max", 65535, "scan untill")
-	udp = flag.Bool("u",false,"use udp instead of tcp")
+	udp       = flag.Bool("u", false, "use udp instead of tcp")
 	timeOut   = flag.Int("t", 1, "time out per request")
-	noOutPut  = flag.Bool("n", false, "work in quiet mode")
+	quiet     = flag.Bool("q", false, "work in quiet mode")
 )
 
 func main() {
 	s := new(sensor)
 	s.init()
-	ch := make(chan int,1)
-	done := make(chan bool,1)
-	if *noOutPut {
+	ch := make(chan int, 1)
+	done := make(chan bool, 1)
+	if *quiet {
 		fmt.Println("work in quiet mode..")
 	}
 	go s.sendPort(ch)
@@ -48,9 +48,9 @@ func (s *sensor) init() {
 	s.firstPort = *firstPort
 	s.lastPort = *lastPort
 	if *udp {
-		s.proto="udp"
-	}else {
-		s.proto="tcp"
+		s.proto = "udp"
+	} else {
+		s.proto = "tcp"
 	}
 }
 func (s *sensor) sendPort(ch chan int) {
@@ -63,13 +63,13 @@ func (s *sensor) try(port, timeout int, done chan bool) {
 	target := fmt.Sprintf("%s:%d", s.host, port)
 	conn, err := net.DialTimeout(s.proto, target, time.Duration(timeout)*time.Second)
 	if err != nil {
-		if !*noOutPut {
+		if !*quiet {
 			fmt.Println(target, "[close]")
 		}
 	} else {
 		conn.Close()
 		s.record(port)
-		if !*noOutPut {
+		if !*quiet {
 			fmt.Println(target, "[open]")
 		}
 	}
