@@ -12,7 +12,7 @@ import (
 var (
 	host    = flag.String("h", "github.com", "ip or domain")
 	port    = flag.Int("p", 443, "port")
-	count   = flag.Int("n", 4, "count")
+	count   = flag.Int("c", -1, "count")
 	timeout = flag.Int("t", 1, "timeout of each request")
 	quiet   = flag.Bool("q", false, "work in quiet mode")
 )
@@ -23,15 +23,16 @@ func main() {
 	flag.Parse()
 	ip := resolv(*host)
 	target := fmt.Sprintf("%s:%d", ip, *port)
-	results := make([]int, 0)
+	results := []int{}
 	go func() {
 		<-c
 		analysis(results[:])
 		os.Exit(0)
 	}() //handle interrupt
 	fmt.Printf("TCPPING %s (%s):\n", *host, ip)
-	for i := 1; i <= *count; i++ {
+	for i := 1; *count != 0; i++ {
 		results = append(results, tcpping(target, i))
+		*count--
 	}
 	analysis(results[:])
 }
@@ -60,7 +61,7 @@ func tcpping(target string, seq int) int {
 	return latency
 }
 func analysis(results []int) {
-	min, max, sum := results[0], results[0], 0
+	min, max, sum, length := results[0], results[0], 0, len(results)
 	for _, val := range results {
 		sum += val
 		if val < min {
@@ -70,5 +71,7 @@ func analysis(results []int) {
 			max = val
 		}
 	}
-	fmt.Printf("min/avg/max = %d/%d/%dms\n", min, sum/(*count), max)
+	fmt.Printf("----------\n")
+	fmt.Printf("total: %d\n", length)
+	fmt.Printf("min/avg/max = %d/%d/%dms\n", min, sum/length, max)
 }
