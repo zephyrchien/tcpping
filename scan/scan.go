@@ -27,17 +27,17 @@ var (
 func main() {
 	s := new(sensor)
 	s.init()
-	ch := make(chan int)
-	end := make(chan int)
+	ch := make(chan int,1)
+	done := make(chan bool,1)
 	if *noOutPut {
 		fmt.Println("work in quiet mode..")
 	}
 	go s.sendPort(ch)
 	for port := range ch {
-		go s.try(port, *timeOut, end)
+		go s.try(port, *timeOut, done)
 	}
 	for i := s.firstPort; i <= s.lastPort; i++ {
-		<-end
+		<-done
 	}
 	s.analysis()
 }
@@ -59,7 +59,7 @@ func (s *sensor) sendPort(ch chan int) {
 	}
 	close(ch)
 }
-func (s *sensor) try(port, timeout int, end chan int) {
+func (s *sensor) try(port, timeout int, done chan bool) {
 	target := fmt.Sprintf("%s:%d", s.host, port)
 	conn, err := net.DialTimeout(s.proto, target, time.Duration(timeout)*time.Second)
 	if err != nil {
@@ -73,7 +73,7 @@ func (s *sensor) try(port, timeout int, end chan int) {
 			fmt.Println(target, "[open]")
 		}
 	}
-	end <- -1
+	done <- true
 }
 
 func (s *sensor) record(port int) {
